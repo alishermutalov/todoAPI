@@ -4,6 +4,8 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth.models import User
 from django.contrib.auth.password_validation import validate_password
 
+from .models import Task
+
 
 class RegisterSerializer(serializers.ModelSerializer):
     password = serializers.CharField(
@@ -63,3 +65,18 @@ class LogoutSerializer(serializers.Serializer):
             RefreshToken(self.token).blacklist()
         except Exception as e:
             raise serializers.ValidationError("Token is not found!")
+        
+
+class TaskSerializer(serializers.ModelSerializer):
+    
+    class Meta:
+        model = Task
+        fields = ['id', 'title', 'description', 'status', 'due_date', 'created_at', 'updated_at', 'user']
+        read_only_fields = ['id', 'created_at', 'updated_at', 'user'] 
+
+    def validate_status(self, value):
+        if value not in dict(Task.TASK_STATUS).keys():
+            raise serializers.ValidationError("Invalid status value.")
+        return value
+    
+    

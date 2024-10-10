@@ -1,11 +1,14 @@
-from rest_framework import status
+from rest_framework import status, generics
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework_simplejwt.views import TokenObtainPairView
-
-from .serializers import LoginSerializer, LogoutSerializer, RegisterSerializer
 from drf_spectacular.utils import extend_schema
+from django_filters.rest_framework import DjangoFilterBackend
+
+from .serializers import LoginSerializer, LogoutSerializer, RegisterSerializer, TaskSerializer
+from .models import Task
+from .filters import TaskFilter
 
 @extend_schema(
     summary="Register a new user",
@@ -73,3 +76,67 @@ class LoginView(TokenObtainPairView):
     permission_classes = [AllowAny]
     serializer_class = LoginSerializer
     
+
+class TaskCreateView(generics.CreateAPIView):
+    queryset = Task.objects.all()
+    serializer_class = TaskSerializer
+    permission_classes = [IsAuthenticated]
+    
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+        
+        return Response({"message":"Task created successfully!"})
+    
+
+class TaskListView(generics.ListAPIView):
+    permission_classes = [IsAuthenticated,]
+    serializer_class = TaskSerializer
+    queryset = Task.objects.all().order_by('-created_at')
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = TaskFilter
+    
+    
+class TaskDetailView(generics.RetrieveAPIView):
+    serializer_class = TaskSerializer
+    permission_classes = [IsAuthenticated,]
+    
+    def get_object(self):
+        task = super().get_object()
+        if task.user != self.request.user:
+            self.permission_denied(self.request)
+        return task
+    
+    
+class TaskUpdateView(generics.UpdateAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = TaskSerializer
+    
+    def get_object(self):
+        task = super().get_object()
+        if task.user != self.request.user:
+            self.permission_denied(self.request)
+        return task
+
+    def update(self, request, *args, **kwargs):
+        partial = kwargs.pop('partial', True)
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+        return Response(serializer.data)
+    
+    
+class TaskDeleteView(generics.DestroyAPIView):
+    queryset = Task.objects.all()
+    permission_classes = [IsAuthenticated]
+
+    def get_object(self):
+        task = super().get_object()
+        if task.user != self.request.user:
+            self.permission_denied(self.request)
+        return task
+
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        self.perform_destroy(instance)
+        return Response(status=status.HTTP_204_NO_CONTENT)
