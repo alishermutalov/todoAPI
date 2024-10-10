@@ -62,4 +62,4 @@ class LogoutSerializer(serializers.Serializer):
         try:
             RefreshToken(self.token).blacklist()
         except Exception as e:
-            self.fail('bad_token')
+            raise serializers.ValidationError("Token is not found!")

@@ -53,7 +53,7 @@ INSTALLED_APPS = [
 REST_FRAMEWORK = {
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
     'DEFAULT_PERMISSION_CLASSES':[
-        'rest_framework.permissions.IsAuthenticated',
+        'rest_framework.permissions.AllowAny',
     ],
     'DEFAULT_AUTHENTICATION_CLASSES':[
         'rest_framework_simplejwt.authentication.JWTAuthentication'
@@ -188,4 +188,6 @@ SPECTACULAR_SETTINGS = {
     'TITLE': 'TODO API',
     'DESCRIPTION': 'API documentation',
     'VERSION': '1.0.0',
+    'SERVE_PUBLIC': True,
+    'SECURITY': [],  
 }

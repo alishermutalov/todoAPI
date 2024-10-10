@@ -8,7 +8,7 @@ from .serializers import LoginSerializer, LogoutSerializer, RegisterSerializer
 
 
 class RegisterView(APIView):
-    permission_classes = [AllowAny,]
+    permission_classes = [AllowAny]
     
     def post(self, request):
         serializer = RegisterSerializer(data=request.data)
@@ -22,6 +22,7 @@ class RegisterView(APIView):
 
 
 class LogoutView(APIView):
+    permission_classes = [IsAuthenticated,]
     serializer_class = LogoutSerializer
 
     def post(self, request):
@@ -37,8 +38,7 @@ class LogoutView(APIView):
 
 
 class LoginView(TokenObtainPairView):
-    permission_classes = [AllowAny,]
+    permission_classes = [AllowAny]
     serializer_class = LoginSerializer
     
-
 
