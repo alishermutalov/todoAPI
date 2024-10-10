@@ -161,5 +161,3 @@ class CommentListView(generics.ListAPIView):
     def get_queryset(self):
         task_id = self.kwargs.get('task_id')
         return Comment.objects.filter(task_id=task_id).order_by('-created_at')
-    
-    
