@@ -124,10 +124,4 @@ Contributions are welcome! Please open an issue or submit a pull request for any
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-```
 
-### Notes
-
-- Replace the placeholder texts and examples with actual data from your application as needed.
-- Make sure to update any sections if there are specific instructions or details unique to your project.
-- You can add or remove features, usage examples, and other sections based on your needs.
