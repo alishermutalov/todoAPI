@@ -1,10 +1,12 @@
+from datetime import datetime
 from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth.models import User
 from django.contrib.auth.password_validation import validate_password
+from django.utils import timezone
 
-from .models import Task
+from .models import Task, Comment
 
 
 class RegisterSerializer(serializers.ModelSerializer):
@@ -79,4 +81,21 @@ class TaskSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("Invalid status value.")
         return value
     
+    def validate(self, attrs):
+        due_date = attrs.get('due_date')
+        if due_date < timezone.now():
+            raise serializers.ValidationError("This time cannot be an elapsed time")
+        return attrs
     
+    
+class CommentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Comment
+        fields = ['id','text','created_at','task','user']
+        read_only_fields = ['created_at','task','user']
+        
+    def create(self, validated_data):
+        request = self.context.get('request', None)
+        if request:
+            validated_data['user'] = request.user
+        return super().create(validated_data)

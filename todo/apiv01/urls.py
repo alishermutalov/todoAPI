@@ -1,7 +1,8 @@
 from django.urls import path
 from rest_framework_simplejwt.views import TokenRefreshView
 from .views import LoginView, LogoutView, RegisterView, TaskCreateView,\
-    TaskListView, TaskDetailView, TaskUpdateView, TaskDeleteView
+    TaskListView, TaskDetailView, TaskUpdateView, TaskDeleteView,\
+        CommentCreateView, CommentListView
 
 urlpatterns = [
     #Auth
@@ -15,4 +16,7 @@ urlpatterns = [
     path('task/detail/<int:pk>/', TaskDetailView.as_view(), name="task-detail"),
     path('task/update/<int:pk>/', TaskUpdateView.as_view(), name="task-update"),
     path('task/delete/<int:pk>/', TaskDeleteView.as_view(), name="task-delete"),
+    #Comment
+    path('tasks/<int:task_id>/comments/', CommentListView.as_view(), name='comment-list'),
+    path('tasks/<int:task_id>/comments/create/', CommentCreateView.as_view(), name='comment-create'),
 ]

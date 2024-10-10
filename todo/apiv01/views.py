@@ -6,8 +6,9 @@ from rest_framework_simplejwt.views import TokenObtainPairView
 from drf_spectacular.utils import extend_schema
 from django_filters.rest_framework import DjangoFilterBackend
 
-from .serializers import LoginSerializer, LogoutSerializer, RegisterSerializer, TaskSerializer
-from .models import Task
+from .serializers import LoginSerializer, LogoutSerializer, \
+    RegisterSerializer, TaskSerializer, CommentSerializer
+from .models import Task, Comment
 from .filters import TaskFilter
 
 @extend_schema(
@@ -110,6 +111,7 @@ class TaskDetailView(generics.RetrieveAPIView):
 class TaskUpdateView(generics.UpdateAPIView):
     permission_classes = [IsAuthenticated]
     serializer_class = TaskSerializer
+    queryset = Task.objects.all()
     
     def get_object(self):
         task = super().get_object()
@@ -140,3 +142,25 @@ class TaskDeleteView(generics.DestroyAPIView):
         instance = self.get_object()
         self.perform_destroy(instance)
         return Response(status=status.HTTP_204_NO_CONTENT)
+    
+    
+class CommentCreateView(generics.CreateAPIView):
+    queryset = Comment.objects.all()
+    serializer_class = CommentSerializer
+    permission_classes = [IsAuthenticated]  
+
+    def perform_create(self, serializer):
+        task_id = self.kwargs.get('task_id')  
+        serializer.save(task_id=task_id, user=self.request.user) 
+    
+    
+class CommentListView(generics.ListAPIView):
+    queryset = Comment.objects.all().order_by("-created_at")
+    serializer_class = CommentSerializer
+    permission_classes = [IsAuthenticated] 
+    
+    def get_queryset(self):
+        task_id = self.kwargs.get('task_id')
+        return Comment.objects.filter(task_id=task_id)
+    
+    
