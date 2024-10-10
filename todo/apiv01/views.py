@@ -155,12 +155,11 @@ class CommentCreateView(generics.CreateAPIView):
     
     
 class CommentListView(generics.ListAPIView):
-    queryset = Comment.objects.all().order_by("-created_at")
     serializer_class = CommentSerializer
     permission_classes = [IsAuthenticated] 
     
     def get_queryset(self):
         task_id = self.kwargs.get('task_id')
-        return Comment.objects.filter(task_id=task_id)
+        return Comment.objects.filter(task_id=task_id).order_by('-created_at')
     
     
