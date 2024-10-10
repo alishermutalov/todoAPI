@@ -5,8 +5,24 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework_simplejwt.views import TokenObtainPairView
 
 from .serializers import LoginSerializer, LogoutSerializer, RegisterSerializer
+from drf_spectacular.utils import extend_schema
 
-
+@extend_schema(
+    summary="Register a new user",
+    request=RegisterSerializer,
+    responses={
+        201: 'User registered successfully!',
+        400: 'Bad Request',
+    },
+    description=(
+        "Register a new user. \n\n"
+        "Example:\n"
+        "- Username: `test_user`\n"
+        "\n"
+        "- Password: `test_password`\n"
+        "You can use this test user for testing the API."
+    ),
+)
 class RegisterView(APIView):
     permission_classes = [AllowAny]
     
@@ -34,11 +50,26 @@ class LogoutView(APIView):
             data={
                 "message":"Successfully Logged out!"
                 },
-            status=status.HTTP_204_NO_CONTENT)
+            status=status.HTTP_200_OK)
 
 
+@extend_schema(
+    summary="Login user",
+    request=LoginSerializer,
+    responses={
+        200: 'User logged in successfully!',
+        400: 'Bad Request',
+    },
+    description=(
+        "Login test user. \n\n"
+        "Test user info:\n"
+        "- Username: `new_user`\n"
+        "\n"
+        "- Password: `new_password123`\n"
+        "You can use this test user for testing the API."
+    ),
+)
 class LoginView(TokenObtainPairView):
     permission_classes = [AllowAny]
     serializer_class = LoginSerializer
     
-
